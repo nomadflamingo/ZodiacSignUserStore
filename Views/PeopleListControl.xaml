@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="ZodiacSignUserStore.Views.PeopleListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ZodiacSignUserStore.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
+            <TextBlock Margin="0 0 10 0">Filter: </TextBlock>
+            <TextBox Width="200" Margin="0 0 10 0" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Content="Add" Command="{Binding AddCommand}" Margin="0 0 5 0"/>
+            <Button Content="Delete" Command="{Binding DeleteCommand}" />
+        </StackPanel>
+
+        <DataGrid x:Name="PeopleGrid"
+                  Grid.Row="1" 
+                  ItemsSource="{Binding People}" 
+                  AutoGenerateColumns="False"
+                  SelectedItem="{Binding SelectedPerson, Mode=TwoWay}" 
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  IsReadOnly="False"
+                  CellEditEnding="PeopleGrid_CellEditEnding"
+                  BeginningEdit="PeopleGrid_BeginningEdit">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="First Name"
+                            Binding="{Binding FirstName, Mode=TwoWay, ValidatesOnDataErrors=True,UpdateSourceTrigger=LostFocus}"/>
+                <DataGridTextColumn Header="Last Name"
+                            Binding="{Binding LastName, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=LostFocus}"/>
+                <DataGridTextColumn Header="Email"
+                            Binding="{Binding Email, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=LostFocus}"/>
+                <DataGridTextColumn Header="Birth Date"
+                            Binding="{Binding BirthDate, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=LostFocus}"/>
+
+                <!-- Read Only Fields -->
+                <DataGridTextColumn Header="Is Adult" Binding="{Binding IsAdult}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Sun Sign" Binding="{Binding SunSign}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Chinese Sign" Binding="{Binding ChineseSign}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Birthday" Binding="{Binding IsBirthday}" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button Content="Sort by Name" Command="{Binding SortCommand}" CommandParameter="FirstName" Margin="0 0 10 0"/>
+            <Button Content="Sort by Birth Date" Command="{Binding SortCommand}" CommandParameter="BirthDate"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
