@@ -15,6 +15,13 @@ internal partial class PeopleListViewModel : ObservableObject
 {
     private const string FilePath = "C:\\Users\\tetre\\Documents\\mydocs\\study\\sem8\\sharp\\ZodiacSignUserStore\\people.json";
 
+    private ObservableCollection<Person> _allPeople;
+    public ObservableCollection<Person> AllPeople
+    {
+        get => _allPeople;
+        set => SetProperty(ref _allPeople, value);
+    }
+
     [ObservableProperty]
     private ObservableCollection<Person> people;
 
@@ -25,23 +32,23 @@ internal partial class PeopleListViewModel : ObservableObject
     private Person? selectedPerson;
 
     public IRelayCommand AddCommand { get; }
-    public IRelayCommand EditCommand { get; }
     public IRelayCommand DeleteCommand { get; }
     public IRelayCommand<string> SortCommand { get; }
 
 
     public PeopleListViewModel()
     {
-        People = LoadOrGeneratePeople();
+        AllPeople = LoadOrGeneratePeople();
 
-        foreach (var person in People)
+        foreach (var person in AllPeople)
         {
             person.ValidationFailed += OnValidationFailed;
             person.PropertyChanged += OnPersonChanged;
         }
 
+        People = new ObservableCollection<Person>(AllPeople);
+
         AddCommand = new RelayCommand(AddPerson);
-        EditCommand = new RelayCommand(EditPerson, () => SelectedPerson != null);
         DeleteCommand = new RelayCommand(DeletePerson, () => SelectedPerson != null);
         SortCommand = new RelayCommand<string>(SortBy);
 
@@ -49,7 +56,6 @@ internal partial class PeopleListViewModel : ObservableObject
         {
             if (e.PropertyName == nameof(SelectedPerson))
             {
-                EditCommand.NotifyCanExecuteChanged();
                 DeleteCommand.NotifyCanExecuteChanged();
             }
             if (e.PropertyName == nameof(FilterText))
@@ -95,21 +101,24 @@ internal partial class PeopleListViewModel : ObservableObject
 
     private void ApplyFilter()
     {
-        if (string.IsNullOrWhiteSpace(FilterText))
+        // Take all items
+        var itemsToDisplay = AllPeople.AsEnumerable();
+
+        // If we have filter text, apply it
+        if (!string.IsNullOrWhiteSpace(FilterText))
         {
-            People = LoadOrGeneratePeople(); // Reset
-        }
-        else
-        {
-            var lower = FilterText.ToLower();
-            People = new ObservableCollection<Person>(People.Where(p =>
+            string lower = FilterText.ToLower();
+            itemsToDisplay = itemsToDisplay.Where(p =>
                 p.FirstName.ToLower().Contains(lower) ||
                 p.LastName.ToLower().Contains(lower) ||
                 (p.Email?.ToLower().Contains(lower) ?? false) ||
                 (p.SunSign?.ToLower().Contains(lower) ?? false) ||
                 (p.ChineseSign?.ToLower().Contains(lower) ?? false)
-            ));
+            );
         }
+
+        // Assign the filtered list
+        People = new ObservableCollection<Person>(itemsToDisplay);
     }
 
     private void SortBy(string property)
@@ -123,8 +132,11 @@ internal partial class PeopleListViewModel : ObservableObject
     private void AddPerson()
     {
         var newPerson = new Person("New", "User", "new@mail.com", DateOnly.FromDateTime(DateTime.Today.AddYears(-20)));
-        People.Add(newPerson);
-        SavePeople(People);
+        newPerson.PropertyChanged += OnPersonChanged;
+        AllPeople.Add(newPerson);
+        SavePeople(AllPeople);
+
+        ApplyFilter(); // to refresh the UI with the newly added record
     }
 
     private void DeletePerson()

@@ -22,8 +22,6 @@ namespace ZodiacSignUserStore.Models
             get => _firstName;
             set
             {
-                if (_firstName == value)
-                    return; // prevent duplicate call
                 var previous = _firstName;
                 try
                 {
@@ -48,8 +46,6 @@ namespace ZodiacSignUserStore.Models
             get => _lastName;
             set
             {
-                if (_lastName == value)
-                    return; // prevent duplicate call
                 var previous = _lastName;
                 try
                 {
@@ -74,8 +70,6 @@ namespace ZodiacSignUserStore.Models
             get => _email;
             set
             {
-                if (_email == value)
-                    return; // prevent duplicate call
                 var previous = _email;
                 try
                 {
@@ -100,9 +94,6 @@ namespace ZodiacSignUserStore.Models
             get => _birthDate;
             set
             {
-                if (_birthDate == value)
-                    return; // prevent duplicate call
-
                 var previous = _birthDate;
                 try
                 {

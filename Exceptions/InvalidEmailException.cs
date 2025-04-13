@@ -8,6 +8,6 @@ namespace ZodiacSignUserStore.Exceptions
 {
     internal class InvalidEmailException : ArgumentException
     {
-        public InvalidEmailException() : base("The provided email is not in a valid format.") { }
+        public InvalidEmailException() : base("The provided email is not in a valid format") { }
     }
 }
